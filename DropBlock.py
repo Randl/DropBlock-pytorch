@@ -33,7 +33,7 @@ class DropBlock2D(nn.Module):
         self.block_size = block_size
 
     def forward(self, input):
-        if not self.training:
+        if not self.training or self.keep_prob == 1:
             return input
         gamma = (1. - self.keep_prob) / self.block_size ** 2
         for sh in input.shape[2:]:
@@ -46,4 +46,4 @@ class DropBlock2D(nn.Module):
                         groups=input.shape[1])
         torch.set_printoptions(threshold=5000)
         mask = (Msum < 1).to(device=input.device, dtype=input.dtype)
-        return input * mask * mask.numel() /mask.sum()
+        return input * mask * mask.numel() /mask.sum() #TODO input * mask * self.keep_prob ?
